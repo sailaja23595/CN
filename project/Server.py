@@ -1,68 +1,41 @@
 import socket
 import random
-
-
-
-
-# conn.sendall(ALPHA.encode())
-
-
-
 def getAvailableletter(LETTERGUESSED,TURN):
-  '''
-  letterguessed :list,what letters have been guessed untill now
-    returns:string,comprised of letters that represents what letters have been guessed untill now
-  '''
-
-  # TURN = TURN
-  '''global Turn means calling the turn which is in global into a function'''
-
+# Letter guessed: Lists what letters have been guessed until now.
+# return: String comprised of letters that represents what letters have been guessed until now.
+# TURN means calliing the turn which is in global into a function.
   global ALPHA
-  '''global alpha means calling the alpha i.e alphabets list into the function'''
+# global ALPHA means calling the alpha i.e.. alphabets list into the function.
+  
   for i in LETTERGUESSED:
     if i in SECRETWORD:
-      '''If the letterguessed is in secretWord then remove the letter '''
+    # If the letterguessed is in the secret word then remove the letter.
       conn.sendall("good guess.\n".encode())
       ALPHA.remove(i)
-
-
-
-
     else:
-      '''If the letterguessed not in secretword then remove the letter'''
+    # If letterguessed not in secretword then remove the letter.
       TURN=TURN-1
       ALPHA.remove(i)
       conn.sendall("wrong guess.\n".encode())
   return "".join(ALPHA),TURN
 
-'''If the letterguessed is not in the secretword then then we are replacing with "_"'''
-
 def getguessword(SECRETWORD,lettersGuessed):
-    '''
-    secretWord: string , the word is user guessing
-    lettersGuessed:list,what letters have been guessed so far
-    returns:string,comprised of letters and underscores that represents that represents what letters in secretWord have been guessed so far
-    '''
-    a=SECRETWORD
-
+  # Secret word: string,the word is user guessing.
+  # Letterguessed:List what letters have been guessed so far.
+  # Return: String comprised of letters and underscores that represents what letters in secretword have been guessed so far.
+    s=SECRETWORD
     for d in SECRETWORD:
       if d not in lettersGuessed :
-         a=a.replace(d," _")
-    if a==SECRETWORD:
-      conn.sendall("\nyou won! ".encode())
-      #conn.sendall(SECRETWOR.encode(D)
+         s=s.replace(d," _")
+    if s==SECRETWORD:
+      conn.sendall("\n you won! ".encode())
       return
     else:
-      return(a)
-
-
+      return(s)
 def isWordguessed(SECRETWORD,LETTERGUESSED,l):
-  '''secretWord :string,the word is user guessing
-  letterguessed:list,what letters have been guessed so far
-  '''
   TURN = 8
   length = l
-  #conn.sendall(SECRETWORD)
+  
   lettersGuessed = []
   num=['1','2','3','4','5','6','7','8','9','!','@','#','$','%','^','&','*','(',')',' ?',' ','/']
   conn.sendall(f'\nI am thinking of a word contains letters is {l}\n'.encode())
@@ -99,39 +72,41 @@ def hangman(SECRETWORD,LETTERGUESSED,l):
   isWordguessed(SECRETWORD,LETTERGUESSED,l)
 
 
-players = {'Reetu' : 100}
+players = {'Sailaja' : 100}
 score = 0
 lst = ""
 LETTERGUESSED=[]
 lettersGuessed=[]
-'''To import a word from words.txt into secretWord'''
+# Importing a word randomly from words.txt into secretword.
+
 SECRETWORD=random.choice(open('words.txt').read().split())
-# print("Hello  Welcome to Hangman")
+
 l=len(SECRETWORD)
-'''Here turn are the guesses '''
 
-'''Alphabets are considered into a list as alpha'''
 ALPHA=['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']
-
+# Considering list of alphabets.
 try:
-    soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-except socket.error() as msg:
+except socket.error() as message:
     print('Socket creation failed!')
 
 while True:
-    soc.bind(('127.0.0.1',5000))
-    soc.listen(5)
+    sock.bind(('127.0.0.1',5007))
+    sock.listen(5)
     while True:
-        conn,addr = soc.accept()
-        option = conn.recv(1024).decode() #option 1 or 2
-        if option == '1':  #newusr
+        conn,addr = sock.accept()
+        option = conn.recv(1024).decode() 
+        # Choosing option 1 or 2
+        if option == '1': 
+          # Newuser
             newUser = conn.recv(1024).decode()
             players[newUser] = 0
             conn.sendall("start".encode())
             hangman(SECRETWORD,LETTERGUESSED,l)
             players[newUser] = score
-        else: #existing users
+        else: 
+          # Existing user
             userName = conn.recv(1024).decode()
             if userName in players :
                 conn.sendall("start".encode())
