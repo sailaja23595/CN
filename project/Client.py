@@ -1,18 +1,40 @@
-# Import socket module 
-import socket			 
+import socket
+so = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+port=5000
+so.connect(('127.0.0.1',port))
+while True:
+    print("\n Welcome to the game, Hangman!")
+    print("-"*50)
+    print("Select One Option")
+    print("1.New User ")
+    print("2.Existing User \n")
+    opition = input()
+    so.sendall(opition.encode())
+    while True:
+        if(opition == "1"):
+            userName = input("Enter your Name: ")
+            so.send(userName.encode())
 
-# Create a socket object 
-s = socket.socket()		 
+        elif(opition == "2"):
+            existingName = input("Enter Your Username : ")
+            so.send(existingName.encode())
+        else:
+            print("Enter Valid Input.")
+            continue
+        Status = so.recv(1024).decode()
 
-# Define the port on which you want to connect 
-port = 12345				
-
-# connect to the server on local computer 
-s.connect(('127.0.0.1', port)) 
-while(True):
-    print(s.recv(1024))
-    from_client = raw_input() 
-    s.send(from_client)
-    if(from_client=="3") :
-        break     
-s.close()	 
+        if Status == "start":
+            print(so.recv(1024).decode())
+            # print("-"*50)
+            while True:
+                msg = so.recv(1024).decode() #SecretWord count
+                if msg == "you won":
+                    print(msg,end='')
+                    so.close()
+                    break
+                elif msg[-1] == "1": #input from user
+                    print("entered")
+                    print(msg[:-1], end='')
+                    so.sendall(input().encode())
+                else:
+                    print(msg,end = '')
